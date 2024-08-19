@@ -2,108 +2,77 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>Number guessing game</title>
-    <style>
-      html {
-        font-family: sans-serif;
-      }
-      body {
-        background-color: black;
-        color: white;
-        width: 50%;
-        max-width: 800px;
-        min-width: 480px;
-        margin: 0 auto;
-      }
-      .form input[type="number"] {
-        width: 200px;
-      }
-      .lastResult {
-        color: white;
-        padding: 3px;
-      }
-    </style>
+    <title>Our superheroes</title>
+    <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1>Number guessing game</h1>
-    <p>We have selected a random number between 1 and 100. See if you can guess it in 10 turns or fewer. We'll tell you if your guess was too high or too low.</p>
-    <div class="form">
-      <label for="guessField">Enter a guess: </label>
-      <input type="number" min="1" max="100" required id="guessField" class="guessField">
-      <input type="submit" value="Submit guess" class="guessSubmit">
-    </div>
-    <div class="resultParas">
-      <p class="guesses"></p>
-      <p class="lastResult"></p>
-      <p class="lowOrHi"></p>
-    </div>
-    <script>
-      const guesses = document.querySelector(".guesses");
-      const lastResult = document.querySelector(".lastResult");
-      const lowOrHi = document.querySelector(".lowOrHi");
-      const guessSubmit = document.querySelector(".guessSubmit");
-      const guessField = document.querySelector(".guessField");
-      let randomNumber = Math.floor(Math.random() * 100) + 1;
-      let guessCount = 1;
-      let resetButton;
-      
-      function checkGuess() {
-        const userGuess = Number(guessField.value);
-        if (guessCount === 1) {
-          guesses.textContent = "Previous guesses:";
-        }
-        guesses.textContent = `${guesses.textContent} ${userGuess}`;
+      <header>
+      </header>
+      <section>
+      </section>
+      <script>
+        async function populate() {
+          const requestURL =
+            //"https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json";
+            "https://mdn.github.io/leblancr/Node.js/superheroes.json";
+          const request = new Request(requestURL);
+          const response = await fetch(request);
+          const superHeroes = await response.json();
+          console.log(superHeroes)
 
-        if (userGuess === randomNumber) {
-          lastResult.textContent = "Congratulations! You got it right!";
-          lastResult.style.backgroundColor = "green";
-          lowOrHi.textContent = "";
-          setGameOver();
-        } else if (guessCount === 10) {
-          lastResult.textContent = "!!!GAME OVER!!!";
-          lowOrHi.textContent = "";
-          setGameOver();
-        } else {
-          lastResult.textContent = "Wrong!";
-          lastResult.style.backgroundColor = "red";
-          if (userGuess < randomNumber) {
-            lowOrHi.textContent = "Last guess was too low!";
-          } else if (userGuess > randomNumber) {
-            lowOrHi.textContent = "Last guess was too high!";
+          populateHeader(superHeroes);
+          populateHeroes(superHeroes);
+
+
+        }
+
+        function populateHeader(obj) {
+          const header = document.querySelector("header");
+          const myH1 = document.createElement("h1");
+          myH1.textContent = obj.squadName;
+          header.appendChild(myH1);
+
+          const myPara = document.createElement("p");
+          myPara.textContent = `Hometown: ${obj.homeTown} // Formed: ${obj.formed}`;
+          header.appendChild(myPara);
+        }
+
+        function populateHeroes(obj) {
+          const section = document.querySelector("section");
+          const heroes = obj.members;
+
+          for (const hero of heroes) {
+            const myArticle = document.createElement("article");
+            const myH2 = document.createElement("h2");
+            const myPara1 = document.createElement("p");
+            const myPara2 = document.createElement("p");
+            const myPara3 = document.createElement("p");
+            const myList = document.createElement("ul");
+
+            myH2.textContent = hero.name;
+            myPara1.textContent = `Secret identity: ${hero.secretIdentity}`;
+            myPara2.textContent = `Age: ${hero.age}`;
+            myPara3.textContent = "Superpowers:";
+
+            const superPowers = hero.powers;
+            for (const power of superPowers) {
+              const listItem = document.createElement("li");
+              listItem.textContent = power;
+              myList.appendChild(listItem);
+            }
+
+            myArticle.appendChild(myH2);
+            myArticle.appendChild(myPara1);
+            myArticle.appendChild(myPara2);
+            myArticle.appendChild(myPara3);
+            myArticle.appendChild(myList);
+
+            section.appendChild(myArticle);
           }
         }
-        guessCount++;
-        guessField.value = "";
-        guessField.focus();
-      }
-      guessSubmit.addEventListener("click", checkGuess);
-      function setGameOver() {
-        guessField.disabled = true;
-        guessSubmit.disabled = true;
-        resetButton = document.createElement("button");
-        resetButton.textContent = "Start new game";
-        document.body.append(resetButton);
-        resetButton.addEventListener("click", resetGame);
-      }
-      function resetGame() {
-        guessCount = 1;
+        populate();
 
-        const resetParas = document.querySelectorAll(".resultParas p");
-        for (const resetPara of resetParas) {
-          resetPara.textContent = "";
-        }
-
-        resetButton.parentNode.removeChild(resetButton);
-
-        guessField.disabled = false;
-        guessSubmit.disabled = false;
-        guessField.value = "";
-        guessField.focus();
-
-        lastResult.style.backgroundColor = "black";
-
-        randomNumber = Math.floor(Math.random() * 100) + 1;
-      }
-    </script>
+      </script>
   </body>
 </html>
